@@ -9,6 +9,5 @@ ga('send', 'pageview');
 f.parentNode.insertBefore(s,f)})(document,'script',
 '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js');
 (adsbygoogle = window.adsbygoogle || []).push({
-	google_ad_client: "ca-pub-1081778625571362",
-	enable_page_level_ads: true
-});
+google_ad_client: "ca-pub-1081778625571362",
+enable_page_level_ads: true});
