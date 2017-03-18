@@ -5,9 +5,11 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 ga('create', 'UA-93959709-1', 'auto');
 ga('send', 'pageview');
 
+/*
 (function(d,n,u,s,f){s=d.createElement(n),f=d.getElementsByTagName(n)[0],s.src=u;
 f.parentNode.insertBefore(s,f)})(document,'script',
 '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js');
 (adsbygoogle = window.adsbygoogle || []).push({
 google_ad_client: "ca-pub-1081778625571362",
 enable_page_level_ads: true});
+*/
