@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+	<head>
+		<title>MSN Chat Log Viewer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="MSN messenger chat log viewer" />
+		<meta name="keywords" content="msn messenger, msn chat log, chat log viewer" />
+		<META name="robots" content="ALL,INDEX,FOLLOW" />
+		<link href="//fonts.googleapis.com/css?family=Sorts+Mill+Goudy|Roboto" rel="stylesheet">
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/balloon-css/0.4.0/balloon.min.css">
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+		<link rel="stylesheet" href="msn-chat-log-viewer.css">
+	</head>
+	<body>
+		<h1>MSN Chat Log Viewer</h1>
+		<h6>Your chat logs will be parsed within your browser, nothing is uploaded.</h6>
+		<form>
+			<label for="chat-logs-file">Choose a file</label>
+			<input class="button-primary" type="file" id="chat-logs-file">
+			<label for="chat-logs-xml">Or, paste content</label>
+			<textarea class="u-full-width" placeholder="Paste in chat logs XML here..." id="chat-logs-xml"></textarea>
+		</form>
+		<div class="u-full-width chat-logs" id="chat-logs"></div>
+		<div class="u-full-width spinner" id="loading-spinner" hidden></div>
+		<script src="msn-chat-log-viewer.js"></script>
+	</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <title>Search NewSMTH</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <meta name="keywords" content="search newsmth"/>
+  <base href="http://www.newsmth.net/" target="_blank" />
+  <script type="text/javascript" src="http://www.newsmth.net/static/www2-main.js"></script>
+  <script type="text/javascript">
+   var install = function()
+   {
+    if (!window.NewSmthSearchClient)
+     document.getElementById('install').className = '';
+   }
+
+   if (window.addEventListener)
+    window.addEventListener('load', install, false);
+   else if (window.attachEvent)
+    window.attachEvent('onload', install);
+  </script>
+  <style type="text/css">
+  body { margin: 0 2em; }
+  body, input { font-family: monaco, monospace; }
+  img { border: none; }
+  hr {
+   height: 0px;
+   border: none;
+   border-bottom: solid 1px #000000;
+  }
+  .center { text-align: center; }
+  .left { text-align: left; }
+  input { margin: 0 1em; }
+  #install {
+   margin: 0;
+   padding: .5em 1em;
+   background: yellow;
+   color: black;
+   font-size: 1em;
+  }
+  #sform {
+   padding: 1em 2em;
+   border-left: solid 6px #000000;
+  }
+  #sform p { margin: .2em 0; }
+  #sform-title {
+   padding: .5em 1em;
+   text-align: left;
+   background: #000000;
+   color: #ffffff;
+  }
+  #sform-title h1,
+  #sform-title form,
+  #sform-title p {
+   margin: 0;
+   padding: 0;
+   display: inline;
+  }
+  #sform-title a {
+   color: #ff0000;
+   text-decoration: none;
+   font-weight: bold;
+  }
+  #login-status { float: right; }
+  #user-display { text-decoration: underline; }
+  #results { margin: .5em 0; }
+  .hidden,
+  .logged-out .in,
+  .logged-in .out { display: none !important; }
+  #bd { width: 50em; }
+  .result p {
+   font-weight: bold;
+   margin: 1em 0 .4em 0;
+   border-bottom: dashed 3px #f0f0f0;
+   color: #888888;
+  }
+  .result a { text-decoration: none; }
+  .result .count { color: black; }
+  .result .tools {
+   float: right;
+   border: none;
+   margin: 0;
+  }
+  .result .tools a,
+  .popout a { color: red; }
+  .result-table { width: 100%; }
+  .result-table .odd { background: #fafafa; }
+  .result-table td {
+   white-space: nowrap;
+   padding: .2em .6em;
+  }
+  .result-table .date { width: 6em; }
+  .result-table .author { width: 12em; }
+  .result-table .popout { width: 1.2em; }
+  #footer { text-align: right; }
+  #post-panel {
+   background: #333333;
+   position: fixed;
+   top: 1em;
+   bottom: 1em;
+   width: 45em;
+   left: 50%;
+   margin-left: -22.5em;
+   border: solid 2px #555555;
+   z-index: 9;
+  }
+  #post-text {
+   background: black;
+   color: silver;
+   font-family: nsimsun, monospace;
+   white-space: pre-wrap;
+   overflow: auto;
+   position: absolute;
+   top: 2em;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   padding: .5em;
+  }
+  #post-text h4 {
+   background: yellow;
+   color: black;
+   margin: 0;
+   padding: .4em 1em;
+   font-family: monaco monospace;
+  }
+  #post-text img { border: solid 10px white; }
+  #post-text a { color: inherit; }
+  #post-title {
+   margin: .25em;
+   text-align: right;
+   color: silver;
+  }
+  #post-title a {
+   color: red;
+   text-decoration: none;
+  }
+  #page-overlay {
+   z-index: 1;
+   background: #000000;
+   position: fixed;
+   opacity: .75;
+   top: 0;
+   left: 0;
+   bottom: 0;
+   right: 0;
+  }
+  #pboards {
+   clear: both;
+   overflow: auto;
+   background: #f5f5f5;
+   border: 1px solid #e0e0e0;
+   position: absolute;
+   z-index: 9;
+  }
+  #pboards h4 {
+   margin: 0;
+   padding: 0;
+   clear: both;
+   text-align: center;
+   background: #f0f0f0;
+   border-top: solid 1px #e0e0e0;
+   font-weight: normal;
+   overflow: hidden;
+  }
+  #pboard-close, #pboard-reset {
+   display: block;
+   width: 50%;
+   float: left;
+   padding: .3em 0;
+   margin: 1px 0;
+   color: black;
+   text-decoration: none;
+  }
+  #pboard-close:hover, #pboard-reset:hover {
+   background: #fafafa;
+  }
+  .column {
+   margin: .7em 1em .7em 0;
+   float: left;
+  }
+  /* ansi color styles */
+  .reply { color: teal; }
+  .reset {
+   background-color: black;
+   color: white;
+   font-weight: normal;
+   text-decoration: none;
+  }
+  .italic { font-style: italic; }
+  .underline { text-decoration: underline; }
+  .slow-blink {}
+  .rapid-blink {}
+  .negative {}
+  .underline-off { text-decoration: none; }
+  .blink-off {}
+  .positive {}
+  .f-black { color: black; }
+  .f-red { color: maroon; }
+  .f-green { color: green; }
+  .f-yellow { color: olive; }
+  .f-blue { color: navy; }
+  .f-magenta { color: purple; }
+  .f-cyan { color: teal; }
+  .f-white { color: silver; }
+  .b-black { background-color: black; }
+  .b-red { background-color: maroon; }
+  .b-green { background-color: green; }
+  .b-yellow { background-color: olive; }
+  .b-blue { background-color: navy; }
+  .b-magenta { background-color: purple; }
+  .b-cyan { background-color: teal; }
+  .b-white { background-color: silver; }
+  .bold.f-black { color: gray; }
+  .bold.f-red { color: red; }
+  .bold.f-green { color: lime; }
+  .bold.f-yellow { color: yellow; }
+  .bold.f-blue { color: blue; }
+  .bold.f-magenta { color: fuchsia; }
+  .bold.f-cyan { color: cyan; }
+  .bold.f-white { color: white; }
+  .bold.b-black { background-color: gray; }
+  .bold.b-red { background-color: red; }
+  .bold.b-green { background-color: lime; }
+  .bold.b-yellow { background-color: yellow; }
+  .bold.b-blue { background-color: blue; }
+  .bold.b-magenta { background-color: fuchsia; }
+  .bold.b-cyan { background-color: cyan; }
+  .bold.b-white { background-color: white; }
+  </style>
+ </head>
+ <body>
+  <iframe id="login-frame" name="login-frame" class="hidden"></iframe>
+  <div id="page-overlay" class="hidden"></div>
+  <div id="post-panel" class="hidden">
+   <h3 id="post-title">
+    <a id="result-prev" href="###">&lt;</a>
+    搜索结果
+    <a id="result-next" href="###">&gt;</a>
+    <a id="post-prev" href="###">&lt;</a>
+    同主题
+    <a id="post-next" href="###">&gt;</a>
+    <a id="post-close" href="###">X</a>
+   </h3>
+   <div id="post-text"></div>
+   <textarea id="entity-conv" class="hidden"></textarea>
+  </div>
+  <h1 id="install" class="hidden">
+   想摸索水木, 请先安装
+   <a href="https://addons.mozilla.org/en-US/firefox/addon/748">Greasemonkey</a>,
+   安装完成之后刷新本页, 然后点击
+   <a href="http://newsmth-search-client.googlecode.com/svn/trunk/search-newsmth.user.js">search-newsmth.user.js</a>,
+   确定之后再刷新本页.
+   目前只支持 Firefox.
+  </h1>
+  <div id="sform-wrapper">
+   <div id="sform-title">
+    <p>摸索水木<sup>&beta;</sup></p>
+    <div id="login-status" class="hidden">
+     <form id="lform" class="out" method="post" action="http://www.newsmth.net/bbslogin2.php" target="login-frame">
+      <input name="kick_multi" value="1" type="hidden"/>
+      <p>
+       <label for="user">用户</label><input id="user" name="id" type="text"/>
+       <label for="pswd">密码</label><input id="pswd" name="passwd" type="password"/>
+       <input id="login" value="登陆" type="submit"/>
+      </p>
+     </form>
+     <p class="in">
+      登陆名 <span id="user-display"></span>
+      <a id="logout" href="/bbslogout.php" target="login-frame">退出</a>
+     </p>
+    </div>
+   </div>
+   <form id="sform" class="left" method="get" action="/bbsbfind.php">
+    <input name="q" value="1" type="hidden"/>
+    <p><label for="bd">版面</label><input id="bd" name="board" type="text" value="NewSoftware"/><span>(多个版块请用半角逗号分隔)</span>
+     <div id="pboards" class="hidden">
+      <div class="column">
+       <input type="checkbox" value="NewExpress" id="NewExpress"/><label for="NewExpress">水木特快</label><br/>
+       <input type="checkbox" value="Stock" id="Stock"/><label for="Stock">股市</label><br/>
+       <input type="checkbox" value="Joke" id="Joke"/><label for="Joke">笑话连篇</label><br/>
+       <input type="checkbox" value="MMJoke" id="MMJoke"/><label for="MMJoke">幽默全方位</label><br/>
+       <input type="checkbox" value="WorkLife" id="WorkLife"/><label for="WorkLife">职业生涯</label><br/>
+       <input type="checkbox" value="RealEstate" id="RealEstate"/><label for="RealEstate">房地产论坛</label><br/>
+       <input type="checkbox" value="Stock_SMIF" id="Stock_SMIF"/><label for="Stock_SMIF">水木网际基金管理公司</label><br/>
+       <input type="checkbox" value="Career_POST" id="Career_POST"/><label for="Career_POST">招聘信息发布</label><br/>
+      </div>
+      <div class="column">
+       <input type="checkbox" value="PieLove" id="PieLove"/><label for="PieLove">鹊桥·征男友女友</label><br/>
+       <input type="checkbox" value="Love" id="Love"/><label for="Love">谈情说爱</label><br/>
+       <input type="checkbox" value="FamilyLife" id="FamilyLife"/><label for="FamilyLife">家庭生活</label><br/>
+       <input type="checkbox" value="Children" id="Children"/><label for="Children">孩子</label><br/>
+       <input type="checkbox" value="Age" id="Age"/><label for="Age">大龄男女</label><br/>
+       <input type="checkbox" value="Elite" id="Elite"/><label for="Elite">三十而立</label><br/>
+       <input type="checkbox" value="MyPhoto" id="MyPhoto"/><label for="MyPhoto">个人Show</label><br/>
+       <input type="checkbox" value="Picture" id="Picture"/><label for="Picture">贴图</label><br/>
+      </div>
+      <div class="column">
+       <input type="checkbox" value="Movie" id="Movie"/><label for="Movie">电影</label><br/>
+       <input type="checkbox" value="DSLR" id="DSLR"/><label for="DSLR">数码单反</label><br/>
+       <input type="checkbox" value="DigiImage" id="DigiImage"/><label for="DigiImage">数码影像</label><br/>
+       <input type="checkbox" value="AutoWorld" id="AutoWorld"/><label for="AutoWorld">汽车世界</label><br/>
+       <input type="checkbox" value="Emprise" id="Emprise"/><label for="Emprise">武侠世家</label><br/>
+       <input type="checkbox" value="Astrology" id="Astrology"/><label for="Astrology">星座</label><br/>
+       <input type="checkbox" value="Trekking" id="Trekking"/><label for="Trekking">山野穿越</label><br/>
+       <input type="checkbox" value="EconForum" id="EconForum"/><label for="EconForum">经济论坛</label><br/>
+       <input type="checkbox" value="Occupier" id="Occupier"/><label for="Occupier">业主之家</label><br/>
+       <input type="checkbox" value="Mobile" id="Mobile"/><label for="Mobile">手机·移动通信</label><br/>
+       <input type="checkbox" value="PocketLife" id="PocketLife"/><label for="PocketLife">掌上智能</label><br/>
+      </div>
+      <div class="column">
+       <input type="checkbox" value="SecondMarket" id="SecondMarket"/><label for="SecondMarket">二手市场主版</label><br/>
+       <input type="checkbox" value="Ticket" id="Ticket"/><label for="Ticket">车票信息</label><br/>
+       <input type="checkbox" value="OurEstate" id="OurEstate"/><label for="OurEstate">二手房交流</label><br/>
+       <input type="checkbox" value="HouseRent" id="HouseRent"/><label for="HouseRent">房屋出租</label><br/>
+       <input type="checkbox" value="SecondDigi" id="SecondDigi"/><label for="SecondDigi">二手数码产品</label><br/>
+       <input type="checkbox" value="SecondComputer" id="SecondComputer"/><label for="SecondComputer">二手电脑市场</label><br/>
+       <input type="checkbox" value="Notebook" id="Notebook"/><label for="Notebook">笔记本电脑</label><br/>
+       <input type="checkbox" value="ADAgent_HGDG" id="ADAgent_HGDG"/><label for="ADAgent_HGDG">合购代购</label><br/>
+      </div>
+      <div class="column">
+       <input type="checkbox" value="Oversea" id="Oversea"/><label for="Oversea">海外学人</label><br/>
+       <input type="checkbox" value="AdvancedEdu" id="AdvancedEdu"/><label for="AdvancedEdu">飞跃重洋</label><br/>
+       <input type="checkbox" value="PhD" id="PhD"/><label for="PhD">博士生</label><br/>
+       <input type="checkbox" value="Beauty" id="Beauty"/><label for="Beauty">美丽的秘密</label><br/>
+       <input type="checkbox" value="OMTV" id="OMTV"/><label for="OMTV">欧美电视</label><br/>
+      </div>
+      <div class="column">
+       <input type="checkbox" value="TVGame" id="TVGame"/><label for="TVGame">视频游戏</label><br/>
+       <input type="checkbox" value="Game" id="Game"/><label for="Game">电脑游戏</label><br/>
+       <input type="checkbox" value="WoW" id="WoW"/><label for="WoW">魔兽世界</label><br/>
+       <input type="checkbox" value="WorldSoccer" id="WorldSoccer"/><label for="WorldSoccer">国际足球</label><br/>
+       <input type="checkbox" value="Modern_CHN" id="Modern_CHN"/><label for="Modern_CHN">中国近现代史</label><br/>
+       <input type="checkbox" value="MilitaryView" id="MilitaryView"/><label for="MilitaryView">军事瞭望</label><br/>
+       <input type="checkbox" value="History" id="History"/><label for="History">历史</label><br/>
+      </div>
+      <div class="column">
+       <input type="checkbox" value="NewSoftware" id="NewSoftware"/><label for="NewSoftware">新软件介绍</label><br/>
+       <input type="checkbox" value="LinuxApp" id="LinuxApp"/><label for="LinuxApp">Linux系统与应用</label><br/>
+       <input type="checkbox" value="ITExpress" id="ITExpress"/><label for="ITExpress">IT业界特快</label><br/>
+       <input type="checkbox" value="Firefox" id="Firefox"/><label for="Firefox">Firefox浏览器</label><br/>
+       <input type="checkbox" value="ASCIIart" id="ASCIIart"/><label for="ASCIIart">ASCII艺术</label><br/>
+      </div>
+      <h4>
+       <a href="###" id="pboard-close">确定</a>
+       <a href="###" id="pboard-reset">重置</a>
+      </h4>
+     </div>
+    </p>
+    <p><label for="tt">标题</label><input id="tt" name="title" type="text"/><label for="tt2">和</label><input id="tt2" name="title2" type="text"/></p>
+    <p><label for="tt3">不含</label><input id="tt3" name="title3" type="text"/></p>
+    <p><label for="au">作者</label><input id="au" name="userid" type="text"/></p>
+    <p><label for="dt">日期</label><input id="dt" name="dt" value="7" type="text"/>天以内</p>
+    <p>
+     <input name="mg" id="mg" type="checkbox"/><label for="mg">精华</label>
+     <input name="ag" id="ag" type="checkbox"/><label for="ag">含附件</label>
+     <input name="og" id="og" type="checkbox"/><label for="og">不显示回帖</label>
+     <input id="search" value="水木躺好!" type="submit"/>
+     <input id="reserve" type="checkbox"/><label for="reserve">保留上次搜索结果</label>
+    </p>
+   </form>
+  </div>
+  <div id="results"></div>
+  <div id="footer">
+   <hr/>
+   <a href="http://www.newsmth.net/bbsqry.php?userid=a9udn9u">a9udn9u</a> @ <a href="http://www.newsmth.net/frames.html">水木社区</a>
+   <a id="keepalive-url" class="hidden" href="http://www.newsmth.net/bbsqry.php?userid=a9udn9u"></a>
+  </div>
+ </body>
+</html>
