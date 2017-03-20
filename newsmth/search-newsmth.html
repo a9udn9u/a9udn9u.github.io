@@ -8,16 +8,78 @@
   <base href="http://www.newsmth.net/" target="_blank" />
   <script type="text/javascript" src="http://www.newsmth.net/static/www2-main.js"></script>
   <script type="text/javascript">
-   var install = function()
-   {
-    if (!window.NewSmthSearchClient)
-     document.getElementById('install').className = '';
-   }
+/* find DOM nodes satisfy the given criteria */
+Element.prototype.find = function(relation, criteria, greedy, hook, that)
+{
+	var node, next, i, d = document;
 
-   if (window.addEventListener)
-    window.addEventListener('load', install, false);
-   else if (window.attachEvent)
-    window.attachEvent('onload', install);
+	if (!relation || !criteria) return;
+	/* empty criteria is not allowed */
+	if (!criteria.apply || !criteria.call) {
+		i = false;
+		for (k in criteria) { i = true; break; }
+		if (!i) return;
+	}
+
+	if ('ancestor' == relation) node = this.parentNode;
+	else if ('nsibling' == relation) node = this.nextElementSibling;
+	else if ('psibling' == relation) node = this.previousElementSibling;
+	else if ('child' == relation) {
+		/* insert a dummy node as the first element child,
+		 * then search sliblings of the dummy node */
+		var dummy = this.insertBefore(d.createElement('span'), this.firstChild),
+			children = dummy.find('nsibling', criteria, greedy, hook, that);
+		this.removeChild(dummy), dummy = undefined;
+		/* searh deeper, break loop instantly if (!greedy && children) */
+		for (i = 0; i < this.children.length && (greedy || !children); ++i) {
+			dummy = this.children[i].find('child', criteria, greedy, hook, that);
+			if (greedy && dummy)
+				children = children.concat(dummy);
+			else if (!greedy)
+				children = dummy;
+		}
+		return children;
+	}
+	else return;
+
+	if (!node || !node.find) {
+		/* nothing to search from */
+		return greedy ? [] : undefined;
+	} else {
+		/* matching */
+		if (criteria.apply && criteria.call) {
+			if (!criteria.call(node, node))
+				/* function return false, continue searching */
+				return node.find(relation, criteria, greedy, hook, that);
+		} else {
+			for (k in criteria) {
+				if (node[k] != criteria[k]) {
+					/* properties not matched, continue searching */
+					return node.find(relation, criteria, greedy, hook, that);
+				}
+			}
+		}
+		/* found matched node, apply handler */
+		if (hook && hook.apply && hook.call) {
+			that = that ? that : node;
+			hook.call(that, node);
+		}
+		/* greedy search is slow because there can be many array
+		 * concat() calls, flat the iteration will be faster */
+		return greedy ?
+			((next = node.find(relation, criteria, greedy, hook, that)) ?
+				[node].concat(next) : [node])
+			: node;
+	}
+}
+
+var install = function()
+{
+	if (!window.NewSmthSearchClient)
+	document.getElementById('install').className = '';
+}
+
+window.addEventListener('load', install, false);
   </script>
   <style type="text/css">
   body { margin: 0 2em; }
@@ -42,6 +104,7 @@
    padding: 1em 2em;
    border-left: solid 6px #000000;
   }
+  #sform input[type=checkbox] { margin-right: .2em }
   #sform p { margin: .2em 0; }
   #sform-title {
    padding: .5em 1em;
@@ -92,16 +155,19 @@
   .result-table .date { width: 6em; }
   .result-table .author { width: 12em; }
   .result-table .popout { width: 1.2em; }
+  .result-table .selected { background: #e0e0e0; }
   #footer { text-align: right; }
+  .shortcuts { float: left; text-align: left; }
   #post-panel {
-   background: #333333;
+   background: #333;
    position: fixed;
    top: 1em;
    bottom: 1em;
    width: 45em;
    left: 50%;
    margin-left: -22.5em;
-   border: solid 2px #555555;
+   box-shadow: 0px 0px 50px #000;
+   border-radius: 8px 8px 0 0;
    z-index: 9;
   }
   #post-text {
@@ -127,7 +193,7 @@
   #post-text img { border: solid 10px white; }
   #post-text a { color: inherit; }
   #post-title {
-   margin: .25em;
+   margin: .25em .5em;
    text-align: right;
    color: silver;
   }
@@ -180,6 +246,7 @@
    float: left;
   }
   /* ansi color styles */
+  .quoted-author { color: yellow; }
   .reply { color: teal; }
   .reset {
    background-color: black;
@@ -189,11 +256,11 @@
   }
   .italic { font-style: italic; }
   .underline { text-decoration: underline; }
-  .slow-blink {}
-  .rapid-blink {}
+  .slow-blink { text-decoration: blink; }
+  .rapid-blink { text-decoration: blink; }
   .negative {}
   .underline-off { text-decoration: none; }
-  .blink-off {}
+  .blink-off { text-decoration: none; }
   .positive {}
   .f-black { color: black; }
   .f-red { color: maroon; }
@@ -240,16 +307,15 @@
     <a id="post-prev" href="###">&lt;</a>
     同主题
     <a id="post-next" href="###">&gt;</a>
-    <a id="post-close" href="###">X</a>
+    <a id="reply-post" href="###">R</a>
+    <a id="close-post" href="###">X</a>
    </h3>
    <div id="post-text"></div>
    <textarea id="entity-conv" class="hidden"></textarea>
   </div>
   <h1 id="install" class="hidden">
-   想摸索水木, 请先安装
-   <a href="https://addons.mozilla.org/en-US/firefox/addon/748">Greasemonkey</a>,
-   安装完成之后刷新本页, 然后点击
-   <a href="http://newsmth-search-client.googlecode.com/svn/trunk/search-newsmth.user.js">search-newsmth.user.js</a>,
+   想摸索水木, 请先安装 Greasemonkey, 安装完成之后刷新本页, 然后点击
+   <a href="search-newsmth.user.js">search-newsmth.user.js</a>,
    确定之后再刷新本页.
    目前只支持 Firefox.
   </h1>
@@ -342,8 +408,8 @@
        <input type="checkbox" value="ASCIIart" id="ASCIIart"/><label for="ASCIIart">ASCII艺术</label><br/>
       </div>
       <h4>
-       <a href="###" id="pboard-close">确定</a>
        <a href="###" id="pboard-reset">重置</a>
+       <a href="###" id="pboard-close">确定</a>
       </h4>
      </div>
     </p>
@@ -355,14 +421,19 @@
      <input name="mg" id="mg" type="checkbox"/><label for="mg">精华</label>
      <input name="ag" id="ag" type="checkbox"/><label for="ag">含附件</label>
      <input name="og" id="og" type="checkbox"/><label for="og">不显示回帖</label>
+     <input name="-reverse" id="reverse" type="checkbox"/><label for="reverse">逆序排列(新贴在前)</label>
      <input id="search" value="水木躺好!" type="submit"/>
      <input id="reserve" type="checkbox"/><label for="reserve">保留上次搜索结果</label>
     </p>
    </form>
   </div>
   <div id="results"></div>
+  <hr/>
   <div id="footer">
-   <hr/>
+   <span class="shortcuts">
+    主界面下: &uarr; &darr; home end 选择文章, &crarr; &rarr; 查看文章<br/>
+    看贴界面: &larr; &rarr; 查看同主题文章, ctrl+&larr; ctrl+&rarr; 查看前后搜索结果, esc 回到主界面
+   </span>
    <a href="http://www.newsmth.net/bbsqry.php?userid=a9udn9u">a9udn9u</a> @ <a href="http://www.newsmth.net/frames.html">水木社区</a>
    <a id="keepalive-url" class="hidden" href="http://www.newsmth.net/bbsqry.php?userid=a9udn9u"></a>
   </div>
