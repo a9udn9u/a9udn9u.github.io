@@ -1,0 +1,22 @@
+{
+  "name": "quangan.net",
+  "version": "0.0.1",
+  "description": "quangan.net contents",
+  "repository": "https://github.com/a9udn9u/a9udn9u.github.io.git",
+  "author": "Quan Gan (https://github.com/a9udn9u/a9udn9u.github.io.git)",
+  "license": "PRIVATE",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-1": "^6.24.1",
+    "http-server": "^0.11.1",
+    "last-step": "^0.1.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "last-step && rm -fr `ls build/` && mv build/* . && sleep 1 && rm -fr build/",
+    "start": "yarn run compile && http-server -p 8888 -d false ."
+  }
+}
