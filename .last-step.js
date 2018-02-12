@@ -1,43 +1,24 @@
+const { CopyProcessor } = require('~/processors/copy');
+const { BabelProcessor } = require('~/processors/babel');
+
 module.exports = {
-  sourceDirectory: 'src',
-  targetDirectory: 'build',
-  verbose: true,
-  html: [
-    // MSN log viewer
+  sourceDir: 'src',
+  targetDir: 'build',
+
+  rules: [
     {
-      entries: [/^msn\/.*\.html$/]
-		},
-		// NewSMTH search client
-		{
-			entries: [/^newsmth\/.*\.html$/]
-		}
-  ],
-  css: [
-    // MSN log viewer
+      sources: [/^cards\/.*\.js/],
+      processors: [
+        new BabelProcessor({
+          presets: ['env', 'react']
+        })
+      ]
+    },
     {
-      entries: [/^msn\/.*\.(less|css)$/],
-      dest: 'msn/main.css',
-      lessOptions: {}
+      sources: [/^newsmth\/.*/],
+      processors: [
+        new CopyProcessor()
+      ]
     }
-  ],
-  javascript: [
-    // MSN log viewer
-    {
-      entries: [
-        { entry: 'msn/msn-chat-log-viewer.js', dest: 'msn/main.js' },
-        { entry: 'msn/worker/parser-worker.js' }
-      ],
-      rollupOptions: {},
-      babelOptions: {
-        presets: ['es2015-rollup', 'stage-1']
-      },
-      uglifyJSOptions: {}
-		},
-		// NewSMTH search client
-		{
-			entries: [
-				{ entry: 'newsmth/search-newsmth.user.js' }
-			]
-		}
   ]
 };
