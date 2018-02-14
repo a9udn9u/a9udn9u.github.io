@@ -10,7 +10,8 @@ module.exports = {
       sources: [/^cards\/.*\.js/],
       processors: [
         new BabelProcessor({
-          presets: ['env', 'react']
+          presets: ['react', 'env'],
+          plugins: ['transform-class-properties']
         })
       ]
     },

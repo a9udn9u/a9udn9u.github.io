@@ -8,14 +8,10 @@
   "private": true,
   "dependencies": {},
   "devDependencies": {
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-react": "^6.24.1",
-    "google-images": "^2.1.0",
     "http-server": "^0.11.1",
-    "last-step": "file:../LastStep",
-    "onsenui": "^2.9.1",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "react-onsenui": "^1.10.0"
+    "last-step": "file:../LastStep"
   },
   "scripts": {
     "test": "echo 'Error: no test specified' && exit 1",
