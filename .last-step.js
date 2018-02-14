@@ -3,7 +3,7 @@ const { BabelProcessor } = require('~/processors/babel');
 
 module.exports = {
   sourceDir: 'src',
-  targetDir: 'build',
+  targetDir: 'public',
 
   rules: [
     {

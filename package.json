@@ -16,8 +16,8 @@
   "scripts": {
     "test": "echo 'Error: no test specified' && exit 1",
     "watch": "last-step -w",
-    "clean": "rm -fr `ls build/`",
-    "links": "find build -depth 1 -exec ln -s {} \\;",
+    "clean": "rm -fr `ls public/`",
+    "links": "find public -depth 1 -exec ln -sf {} \\;",
     "start": "yarn run clean && yarn run links && http-server -p 8888 -d false -c -1 ."
   }
 }
