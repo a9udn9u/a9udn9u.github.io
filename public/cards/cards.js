@@ -40,6 +40,17 @@ var Utils = function () {
         console.debug.apply(console, arguments);
       }
     }
+  }, {
+    key: 'animScroll',
+    value: function animScroll(element, scrollTop, options) {
+      var firstChild = element.children[0];
+      if (firstChild) {
+        Velocity(firstChild, 'scroll', Object.assign({}, options || {}, {
+          container: element,
+          offset: scrollTop
+        }));
+      }
+    }
   }]);
 
   return Utils;
@@ -247,14 +258,36 @@ var BuildPage = function (_React$Component3) {
       );
     };
 
+    _this5.renderModal = function () {
+      return React.createElement(
+        Ons.Modal,
+        { isOpen: _this5.state.loading },
+        React.createElement(Ons.ProgressCircular, { indeterminate: true })
+      );
+    };
+
     _this5.render = function () {
       return React.createElement(
         Ons.Page,
-        { renderToolbar: _this5.renderToolbar },
+        { className: 'build-page',
+          renderToolbar: _this5.renderToolbar,
+          renderModal: _this5.renderModal },
         React.createElement(ImageList, null)
       );
     };
 
+    _this5.state = { loading: false };
+    EventHub.on(Events.IMAGE_SEARCH_KICKOFF, function (job) {
+      if (job.startIndex === 0) {
+        _this5.setState({ loading: true });
+      }
+    });
+    EventHub.on(Events.IMAGE_SEARCH_RESULTS, function (job) {
+      if (job.startIndex === 0) {
+        Utils.animScroll(document.querySelector('.build-page .page__content'), 0);
+        _this5.setState({ loading: false });
+      }
+    });
     return _this5;
   }
 
@@ -359,7 +392,7 @@ var SearchBar = function (_React$Component4) {
         React.createElement(
           Ons.Button,
           { modifier: 'quiet', onClick: function onClick(e) {
-              return _this6.doSearch(_this6.state.terms, 0);
+              return EventHub.fire(Events.IMAGE_SEARCH_KICKOFF, new SearchJob(_this6.state.terms, 0));
             } },
           '\u641C\u7D22'
         )
@@ -514,7 +547,7 @@ var ReviewPage = function (_React$Component6) {
     _this9.render = function () {
       return React.createElement(
         Ons.Page,
-        { renderToolbar: _this9.renderToolbar },
+        { className: 'review-page', renderToolbar: _this9.renderToolbar },
         React.createElement(CardList, null)
       );
     };
@@ -539,25 +572,24 @@ var CardList = function (_React$Component7) {
     _this10.calculateCardStyle = function () {
       var width = document.body.clientWidth,
           height = document.body.clientHeight;
-      var rowHeightFactor = void 0;
       if (width < height) {
         // Portrait mode
         _this10.cardStyle.width = width;
-        rowHeightFactor = 2;
+        _this10.rowHeightFactor = 2;
         _this10.rowStyle.flexDir = 'column';
       } else {
         _this10.cardStyle.width = width / 2;
-        rowHeightFactor = 1;
+        _this10.rowHeightFactor = 1;
         _this10.rowStyle.flexDir = 'row';
       }
       _this10.cardStyle.width -= _this10.cardMargin * 2;
       _this10.cardStyle.height = _this10.cardStyle.width * _this10.aspectRatio;
-      _this10.rowStyle.height = _this10.cardStyle.height * rowHeightFactor;
+      _this10.rowStyle.height = _this10.cardStyle.height * _this10.rowHeightFactor;
     };
 
     _this10.addCard = function (card) {
       if (!_this10.cardHolder.has(card.text)) {
-        var textWidth = _this10.cardStyle.width * 0.6;
+        var textWidth = Math.min(_this10.cardStyle.width * 0.6, _this10.cardStyle.height * 0.8);
         var length = card.text.length;
         card.fontSize = textWidth / length;
         card.index = _this10.state.cards.length;
@@ -570,6 +602,11 @@ var CardList = function (_React$Component7) {
       _this10.setState({
         cards: _this10.state.cards
       });
+
+      setTimeout(function () {
+        var highlightCard = _this10.cardHolder.get(card.text);
+        Utils.animScroll(document.querySelector('.review-page .page__content'), _this10.rowHeightFactor * highlightCard.index * _this10.cardStyle.height);
+      }, 300);
     };
 
     _this10.renderRow = function (card) {
@@ -598,6 +635,7 @@ var CardList = function (_React$Component7) {
     _this10.cardHolder = new CardHolder();
     _this10.cardStyle = {};
     _this10.rowStyle = {};
+    _this10.rowHeightFactor = 1;
     _this10.aspectRatio = 8 / 11; // US letter
     _this10.cardMargin = 8;
     _this10.calculateCardStyle();
