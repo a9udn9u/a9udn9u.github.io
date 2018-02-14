@@ -272,7 +272,7 @@ var SearchBar = function (_React$Component4) {
                 response = void 0;
                 _context.prev = 7;
                 _context.next = 10;
-                return ImageSearch.search(job.terms, job.startIndex, SEARCH_PAGE_SIZE);
+                return ImageSearch.search(job.terms + ' 卡通', job.startIndex, SEARCH_PAGE_SIZE);
 
               case 10:
                 response = _context.sent;
@@ -361,14 +361,33 @@ var ImageList = function (_React$Component5) {
     var _this7 = _possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).call(this, props));
 
     _this7.shouldComponentUpdate = function (nextProps, nextState) {
-      if (nextState.shouldShow !== _this7.state.shouldShow) {
-        return true;
+      console.log(nextState.images !== _this7.state.images);
+      return nextState.shouldShow !== _this7.state.shouldShow || nextState.itemHeight !== _this7.state.itemHeight || nextState.images !== _this7.state.images;
+    };
+
+    _this7.componentDidMount = function () {
+      _this7.calculateItemHeight();
+      window.addEventListener('resize', _this7.calculateItemHeight);
+    };
+
+    _this7.componentWillUnmount = function () {
+      window.removeEventListener('resize', _this7.calculateItemHeight);
+    };
+
+    _this7.calculateItemHeight = function () {
+      var width = document.body.clientWidth,
+          height = document.body.clientHeight;
+      console.log(width, height);
+      if (width < height) {
+        // Portrait mode
+        _this7.setState({ itemHeight: width });
+      } else {
+        _this7.setState({ itemHeight: Math.floor(height / 3) });
       }
-      return false;
     };
 
     _this7.getItemHeight = function () {
-      return 42 + 2;
+      return _this7.state.itemHeight;
     };
 
     _this7.renderRow = function (index) {
@@ -381,7 +400,11 @@ var ImageList = function (_React$Component5) {
         }, 0);
       }
 
-      return !src ? null : React.createElement('img', { key: index, style: { margin: '5px', width: 'calc(100% - 10px)' }, src: src });
+      return !src ? null : React.createElement('img', { key: index, src: src, onClick: function onClick() {}, style: {
+          height: _this7.state.itemHeight,
+          width: _this7.state.itemHeight,
+          objectFit: 'cover'
+        } });
     };
 
     _this7.render = function () {
@@ -395,7 +418,8 @@ var ImageList = function (_React$Component5) {
     _this7.state = {
       terms: undefined,
       images: [],
-      shouldShow: false
+      shouldShow: false,
+      itemHeight: 100
     };
 
     EventHub.on(Events.IMAGE_SEARCH_RESULTS, function (job) {
@@ -409,7 +433,7 @@ var ImageList = function (_React$Component5) {
         var startIndex = job.startIndex;
         if (job.startIndex !== 0) {
           var tmp = images;
-          images = _this7.state.images.slice();
+          images = _this7.state.images; // Keep reference so no re-render is triggered
           images[startIndex + tmp.length - 1] = undefined; // Ensure array length
           images.splice.apply(images, [startIndex, tmp.length].concat(tmp));
         }
