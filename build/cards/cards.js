@@ -17,9 +17,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var SEARCH_PAGE_SIZE = 10;
 var DEBUG = window.location.hash === '#debug';
 
+var Tabs = {
+  BUILD: 0, REVIEW: 1
+};
+
 var Events = {
   IMAGE_SEARCH_RESULTS: 'ISR',
-  IMAGE_SEARCH_KICKOFF: 'ISK'
+  IMAGE_SEARCH_KICKOFF: 'ISK',
+  NAVIGATE_PAGE: 'NP',
+  ADD_CARD: 'AC'
 };
 
 var Utils = function () {
@@ -52,6 +58,27 @@ var SearchJob = function SearchJob(terms, startIndex) {
   this.startIndex = startIndex;
   this.response = null;
 };
+
+var Card = function Card(text, image) {
+  _classCallCheck(this, Card);
+
+  this.text = text;
+  this.image = image;
+  this.index = 0;
+  this.fontSize = 0;
+};
+
+var CardHolder = function (_Map) {
+  _inherits(CardHolder, _Map);
+
+  function CardHolder() {
+    _classCallCheck(this, CardHolder);
+
+    return _possibleConstructorReturn(this, (CardHolder.__proto__ || Object.getPrototypeOf(CardHolder)).call(this));
+  }
+
+  return CardHolder;
+}(Map);
 
 // Quick & dirty event helpers
 
@@ -132,29 +159,29 @@ var App = function (_React$Component) {
   function App(props) {
     _classCallCheck(this, App);
 
-    var _this2 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+    var _this3 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-    _this2.renderToolbar = function () {
+    _this3.renderToolbar = function () {
       return React.createElement(
         Ons.Toolbar,
-        null,
+        { className: 'page-toolbar' },
         React.createElement(
           'div',
           { className: 'center' },
-          '\u723D\u59D0\u7684\u4E2D\u6587\u5B57\u5361\u5236\u4F5C\u5DE5\u5177'
+          '\u723D\u59D0\u5B57\u5361'
         )
       );
     };
 
-    _this2.render = function () {
+    _this3.render = function () {
       return React.createElement(
         Ons.Page,
-        { renderToolbar: _this2.renderToolbar, className: 'shuang' },
+        { renderToolbar: _this3.renderToolbar, className: 'shuang' },
         React.createElement(TabBar, null)
       );
     };
 
-    return _this2;
+    return _this3;
   }
 
   return App;
@@ -169,9 +196,9 @@ var TabBar = function (_React$Component2) {
   function TabBar(props) {
     _classCallCheck(this, TabBar);
 
-    var _this3 = _possibleConstructorReturn(this, (TabBar.__proto__ || Object.getPrototypeOf(TabBar)).call(this, props));
+    var _this4 = _possibleConstructorReturn(this, (TabBar.__proto__ || Object.getPrototypeOf(TabBar)).call(this, props));
 
-    _this3.renderTabs = function () {
+    _this4.renderTabs = function () {
       return [{
         content: React.createElement(BuildPage, { key: 'build-page' }),
         tab: React.createElement(Ons.Tab, { key: 'build-tab', label: '\u5236\u4F5C', icon: 'ion-settings' })
@@ -181,20 +208,21 @@ var TabBar = function (_React$Component2) {
       }];
     };
 
-    _this3.chooseTab = function (evt) {
-      if (evt.index !== _this3.state.selected) {
-        _this3.setState({ selected: evt.index });
+    _this4.chooseTab = function (evt) {
+      if (evt.index !== _this4.state.selected) {
+        _this4.setState({ selected: evt.index });
       }
     };
 
-    _this3.render = function () {
-      return React.createElement(Ons.Tabbar, { position: 'bottom', index: _this3.state.selected,
-        onPreChange: _this3.chooseTab,
-        renderTabs: _this3.renderTabs });
+    _this4.render = function () {
+      return React.createElement(Ons.Tabbar, { position: 'bottom', index: _this4.state.selected,
+        onPreChange: _this4.chooseTab,
+        renderTabs: _this4.renderTabs });
     };
 
-    _this3.state = { selected: 0 };
-    return _this3;
+    _this4.state = { selected: Tabs.BUILD };
+    EventHub.on(Events.NAVIGATE_PAGE, _this4.chooseTab);
+    return _this4;
   }
 
   return TabBar;
@@ -209,9 +237,9 @@ var BuildPage = function (_React$Component3) {
   function BuildPage(props) {
     _classCallCheck(this, BuildPage);
 
-    var _this4 = _possibleConstructorReturn(this, (BuildPage.__proto__ || Object.getPrototypeOf(BuildPage)).call(this, props));
+    var _this5 = _possibleConstructorReturn(this, (BuildPage.__proto__ || Object.getPrototypeOf(BuildPage)).call(this, props));
 
-    _this4.renderToolbar = function () {
+    _this5.renderToolbar = function () {
       return React.createElement(
         Ons.Toolbar,
         null,
@@ -219,15 +247,15 @@ var BuildPage = function (_React$Component3) {
       );
     };
 
-    _this4.render = function () {
+    _this5.render = function () {
       return React.createElement(
         Ons.Page,
-        { renderToolbar: _this4.renderToolbar },
+        { renderToolbar: _this5.renderToolbar },
         React.createElement(ImageList, null)
       );
     };
 
-    return _this4;
+    return _this5;
   }
 
   return BuildPage;
@@ -240,13 +268,13 @@ var SearchBar = function (_React$Component4) {
   _inherits(SearchBar, _React$Component4);
 
   function SearchBar(props) {
-    var _this6 = this;
+    var _this7 = this;
 
     _classCallCheck(this, SearchBar);
 
-    var _this5 = _possibleConstructorReturn(this, (SearchBar.__proto__ || Object.getPrototypeOf(SearchBar)).call(this, props));
+    var _this6 = _possibleConstructorReturn(this, (SearchBar.__proto__ || Object.getPrototypeOf(SearchBar)).call(this, props));
 
-    _this5.doSearch = function () {
+    _this6.doSearch = function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(terms, startIndex) {
         var job, cachedJob, response;
         return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -261,14 +289,14 @@ var SearchBar = function (_React$Component4) {
                 }
 
                 job = new SearchJob(terms, startIndex);
-                cachedJob = _this5.cache.get(job.id());
+                cachedJob = _this6.cache.get(job.id());
 
                 if (!(cachedJob === undefined)) {
                   _context.next = 20;
                   break;
                 }
 
-                _this5.cache.set(job.id(), job);
+                _this6.cache.set(job.id(), job);
                 response = void 0;
                 _context.prev = 7;
                 _context.next = 10;
@@ -284,13 +312,13 @@ var SearchBar = function (_React$Component4) {
                 _context.t0 = _context['catch'](7);
 
                 Utils.debug(job.id() + ' job failed with exception:', _context.t0);
-                _this5.cache.delete(job.id());
+                _this6.cache.delete(job.id());
 
               case 17:
                 if (response) {
                   if (response.error) {
                     Utils.debug(job.id() + ' job failed with error: ' + response.error);
-                    _this5.cache.delete(job.id()); // Delete job so it will be tried again.
+                    _this6.cache.delete(job.id()); // Delete job so it will be tried again.
                   } else {
                     Utils.debug(job.id() + ' job response received');
                     job.response = response;
@@ -313,7 +341,7 @@ var SearchBar = function (_React$Component4) {
                 return _context.stop();
             }
           }
-        }, _callee, _this6, [[7, 13]]);
+        }, _callee, _this7, [[7, 13]]);
       }));
 
       return function (_x, _x2) {
@@ -321,29 +349,29 @@ var SearchBar = function (_React$Component4) {
       };
     }();
 
-    _this5.render = function () {
+    _this6.render = function () {
       return React.createElement(
         'div',
         { className: 'center search-bar' },
         React.createElement(Ons.SearchInput, { placeholder: '\u641C\u7D22\u914D\u56FE', onChange: function onChange(e) {
-            return _this5.setState({ terms: e.target.value });
+            return _this6.setState({ terms: e.target.value });
           } }),
         React.createElement(
           Ons.Button,
           { modifier: 'quiet', onClick: function onClick(e) {
-              return _this5.doSearch(_this5.state.terms, 0);
+              return _this6.doSearch(_this6.state.terms, 0);
             } },
           '\u641C\u7D22'
         )
       );
     };
 
-    _this5.state = { terms: '' };
-    _this5.cache = new Map();
+    _this6.state = { terms: '' };
+    _this6.cache = new Map();
     EventHub.on(Events.IMAGE_SEARCH_KICKOFF, function (job) {
-      return _this5.doSearch(job.terms, job.startIndex);
+      return _this6.doSearch(job.terms, job.startIndex);
     });
-    return _this5;
+    return _this6;
   }
 
   return SearchBar;
@@ -358,64 +386,70 @@ var ImageList = function (_React$Component5) {
   function ImageList(props) {
     _classCallCheck(this, ImageList);
 
-    var _this7 = _possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).call(this, props));
+    var _this8 = _possibleConstructorReturn(this, (ImageList.__proto__ || Object.getPrototypeOf(ImageList)).call(this, props));
 
-    _this7.shouldComponentUpdate = function (nextProps, nextState) {
-      console.log(nextState.images !== _this7.state.images);
-      return nextState.shouldShow !== _this7.state.shouldShow || nextState.itemHeight !== _this7.state.itemHeight || nextState.images !== _this7.state.images;
+    _this8.shouldComponentUpdate = function (nextProps, nextState) {
+      return nextState.shouldShow !== _this8.state.shouldShow || nextState.itemHeight !== _this8.state.itemHeight || nextState.images !== _this8.state.images;
     };
 
-    _this7.componentDidMount = function () {
-      _this7.calculateItemHeight();
-      window.addEventListener('resize', _this7.calculateItemHeight);
+    _this8.componentDidMount = function () {
+      _this8.calculateItemHeight();
+      window.addEventListener('resize', _this8.calculateItemHeight);
     };
 
-    _this7.componentWillUnmount = function () {
-      window.removeEventListener('resize', _this7.calculateItemHeight);
+    _this8.componentWillUnmount = function () {
+      window.removeEventListener('resize', _this8.calculateItemHeight);
     };
 
-    _this7.calculateItemHeight = function () {
+    _this8.calculateItemHeight = function () {
       var width = document.body.clientWidth,
           height = document.body.clientHeight;
-      console.log(width, height);
       if (width < height) {
         // Portrait mode
-        _this7.setState({ itemHeight: width });
+        _this8.setState({ itemHeight: width });
       } else {
-        _this7.setState({ itemHeight: Math.floor(height / 3) });
+        _this8.setState({ itemHeight: Math.floor(height / 3) });
       }
     };
 
-    _this7.getItemHeight = function () {
-      return _this7.state.itemHeight;
+    _this8.getItemHeight = function () {
+      return _this8.state.itemHeight;
     };
 
-    _this7.renderRow = function (index) {
-      var size = _this7.state.images.length;
-      var src = _this7.state.images[index];
+    _this8.selectImage = function (image) {
+      var card = new Card(_this8.state.terms, image);
+      EventHub.fire(Events.NAVIGATE_PAGE, { index: Tabs.REVIEW });
+      EventHub.fire(Events.ADD_CARD, card);
+    };
+
+    _this8.renderRow = function (index) {
+      var size = _this8.state.images.length;
+      var src = _this8.state.images[index];
 
       if (index % SEARCH_PAGE_SIZE === 0 && index + SEARCH_PAGE_SIZE >= size) {
         setTimeout(function () {
-          EventHub.fire(Events.IMAGE_SEARCH_KICKOFF, new SearchJob(_this7.state.terms, size));
+          EventHub.fire(Events.IMAGE_SEARCH_KICKOFF, new SearchJob(_this8.state.terms, size));
         }, 0);
       }
 
-      return !src ? null : React.createElement('img', { key: index, src: src, onClick: function onClick() {}, style: {
-          height: _this7.state.itemHeight,
-          width: _this7.state.itemHeight,
-          objectFit: 'cover'
+      return !src ? null : React.createElement('img', { key: index, className: 'search-image', src: src, onClick: function onClick() {
+          _this8.selectImage(src);
+        }, style: {
+          height: _this8.state.itemHeight,
+          width: _this8.state.itemHeight
         } });
     };
 
-    _this7.render = function () {
-      if (_this7.state.shouldShow) {
-        return React.createElement(Ons.LazyList, { length: 10000, renderRow: _this7.renderRow, calculateItemHeight: _this7.getItemHeight });
+    _this8.render = function () {
+      if (_this8.state.shouldShow) {
+        return React.createElement(Ons.LazyList, { className: 'search-list', length: 10000,
+          renderRow: _this8.renderRow, calculateItemHeight: _this8.getItemHeight });
       } else {
         return null;
       }
     };
 
-    _this7.state = {
+    _this8.state = {
       terms: undefined,
       images: [],
       shouldShow: false,
@@ -423,7 +457,7 @@ var ImageList = function (_React$Component5) {
     };
 
     EventHub.on(Events.IMAGE_SEARCH_RESULTS, function (job) {
-      if (_this7.state.terms !== job.terms && job.startIndex !== 0) {
+      if (_this8.state.terms !== job.terms && job.startIndex !== 0) {
         Utils.debug(job.id() + ' is likely a stale job, ignoring');
       } else {
         var data = job.response;
@@ -433,18 +467,18 @@ var ImageList = function (_React$Component5) {
         var startIndex = job.startIndex;
         if (job.startIndex !== 0) {
           var tmp = images;
-          images = _this7.state.images; // Keep reference so no re-render is triggered
+          images = _this8.state.images; // Keep reference so no re-render is triggered
           images[startIndex + tmp.length - 1] = undefined; // Ensure array length
           images.splice.apply(images, [startIndex, tmp.length].concat(tmp));
         }
-        _this7.setState({
+        _this8.setState({
           images: images,
           terms: job.terms,
           shouldShow: true
         });
       }
     });
-    return _this7;
+    return _this8;
   }
 
   return ImageList;
@@ -459,24 +493,117 @@ var ReviewPage = function (_React$Component6) {
   function ReviewPage(props) {
     _classCallCheck(this, ReviewPage);
 
-    var _this8 = _possibleConstructorReturn(this, (ReviewPage.__proto__ || Object.getPrototypeOf(ReviewPage)).call(this, props));
+    var _this9 = _possibleConstructorReturn(this, (ReviewPage.__proto__ || Object.getPrototypeOf(ReviewPage)).call(this, props));
 
-    _this8.render = function () {
+    _this9.renderToolbar = function () {
       return React.createElement(
-        Ons.Page,
+        Ons.Toolbar,
         null,
         React.createElement(
-          'section',
-          { className: 'center' },
-          '\u68C0\u89C6'
+          'div',
+          { className: 'center action-bar' },
+          React.createElement(
+            Ons.Button,
+            { modifier: 'quiet', onClick: function onClick(e) {} },
+            '\u521B\u5EFA\u5B57\u5361'
+          )
         )
       );
     };
 
-    return _this8;
+    _this9.render = function () {
+      return React.createElement(
+        Ons.Page,
+        { renderToolbar: _this9.renderToolbar },
+        React.createElement(CardList, null)
+      );
+    };
+
+    return _this9;
   }
 
   return ReviewPage;
+}(React.Component);
+
+// Application - review page - card list
+
+
+var CardList = function (_React$Component7) {
+  _inherits(CardList, _React$Component7);
+
+  function CardList(props) {
+    _classCallCheck(this, CardList);
+
+    var _this10 = _possibleConstructorReturn(this, (CardList.__proto__ || Object.getPrototypeOf(CardList)).call(this, props));
+
+    _this10.calculateCardStyle = function () {
+      var width = document.body.clientWidth,
+          height = document.body.clientHeight;
+      var rowHeightFactor = void 0;
+      if (width < height) {
+        // Portrait mode
+        _this10.cardStyle.width = width;
+        rowHeightFactor = 2;
+        _this10.rowStyle.flexDir = 'column';
+      } else {
+        _this10.cardStyle.width = width / 2;
+        rowHeightFactor = 1;
+        _this10.rowStyle.flexDir = 'row';
+      }
+      _this10.cardStyle.width -= _this10.cardMargin * 2;
+      _this10.cardStyle.height = _this10.cardStyle.width * _this10.aspectRatio;
+      _this10.rowStyle.height = _this10.cardStyle.height * rowHeightFactor;
+    };
+
+    _this10.addCard = function (card) {
+      if (!_this10.cardHolder.has(card.text)) {
+        var textWidth = _this10.cardStyle.width * 0.6;
+        var length = card.text.length;
+        card.fontSize = textWidth / length;
+        card.index = _this10.state.cards.length;
+        _this10.cardHolder.set(card.text, card);
+      }
+      _this10.state.cards[card.index] = card;
+
+      _this10.setState({
+        cards: _this10.state.cards
+      });
+    };
+
+    _this10.renderRow = function (card) {
+      return React.createElement(
+        'div',
+        { key: card.index, className: 'card', style: {
+            marginLeft: _this10.cardMargin,
+            marginRight: _this10.cardMargin,
+            height: _this10.rowStyle.height,
+            flexDirection: _this10.rowStyle.flexDir
+          } },
+        React.createElement(
+          'div',
+          { className: 'card-text', style: Object.assign({ fontSize: card.fontSize }, _this10.cardStyle) },
+          card.text
+        ),
+        React.createElement('img', { className: 'card-image', style: _this10.cardStyle, src: card.image })
+      );
+    };
+
+    _this10.render = function () {
+      return React.createElement(Ons.List, { dataSource: _this10.state.cards, renderRow: _this10.renderRow });
+    };
+
+    _this10.state = { cards: [] };
+    _this10.cardHolder = new CardHolder();
+    _this10.cardStyle = {};
+    _this10.rowStyle = {};
+    _this10.aspectRatio = 8 / 11; // US letter
+    _this10.cardMargin = 8;
+    _this10.calculateCardStyle();
+    EventHub.on(Events.ADD_CARD, _this10.addCard);
+    return _this10;
+  }
+
+  return CardList;
 }(React.Component);
 
 Utils.debug('%cIn DEBUG mode', 'font-weight: bold;');
