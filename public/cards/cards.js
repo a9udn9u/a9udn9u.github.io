@@ -562,8 +562,10 @@ var CardList = function (_React$Component7) {
         card.fontSize = textWidth / length;
         card.index = _this10.state.cards.length;
         _this10.cardHolder.set(card.text, card);
+        _this10.state.cards[card.index] = card;
+      } else {
+        _this10.cardHolder.get(card.text).image = card.image;
       }
-      _this10.state.cards[card.index] = card;
 
       _this10.setState({
         cards: _this10.state.cards
