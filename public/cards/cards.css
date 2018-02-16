@@ -1,45 +1,53 @@
 .shuang .page-toolbar {
   background-image: none;
 }
+
 .shuang .search-bar {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
 }
+
 .shuang .search-bar ons-search-input {
   display: flex;
   flex: 1;
   padding: 0 0 0 10px;
   align-items: center;
 }
+
 .shuang .search-list {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .shuang .search-image {
   object-fit: cover;
 }
+
 .shuang .action-bar {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
 }
+
 .shuang .card {
   padding: 0;
   display: flex;
 }
-.shuang .card-text,
-.shuang .card-image {
+
+.shuang .card-text, .shuang .card-image {
   border-radius: 8px;
 }
+
 .shuang .card-text {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .shuang .card-image {
   object-fit: contain;
 }

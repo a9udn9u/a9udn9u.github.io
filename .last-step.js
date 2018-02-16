@@ -1,5 +1,7 @@
-const { CopyProcessor } = require('~/processors/copy');
-const { BabelProcessor } = require('~/processors/babel');
+const { CopyProcessor } = require('last-step/dist/processors/copy');
+const { LESSProcessor } = require('last-step/dist/processors/less');
+const { CleanCSSProcessor } = require('last-step/dist/processors/clean-css');
+const { RollupJSProcessor } = require('last-step/dist/processors/rollupjs');
 
 module.exports = {
   sourceDir: 'src',
@@ -9,10 +11,19 @@ module.exports = {
     {
       sources: [/^cards\/.*\.js/],
       processors: [
-        new BabelProcessor({
-          presets: ['react', 'env'],
-          plugins: ['transform-class-properties']
+        new RollupJSProcessor({
+          babel: {
+            presets: ['react', ['env', { modules: false }]],
+            plugins: ['transform-class-properties', 'external-helpers']
+          }
         })
+      ]
+    },
+    {
+      sources: [/^msn\/.*\.(less|css)$/],
+      processors: [
+        new LESSProcessor(),
+        new CleanCSSProcessor()
       ]
     },
     {

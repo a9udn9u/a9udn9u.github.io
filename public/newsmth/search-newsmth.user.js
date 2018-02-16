@@ -3,10 +3,13 @@
 // @version        1.5
 // @namespace      nssc
 // @description    Search newsmth.net, and more
+// @run-at         document-start
 // @include        */search-newsmth.html
+// @connect        newsmth.net
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getValue
 // @grant          GM_setValue
+// @grant          unsafeWindow
 // ==/UserScript==
 
 /* configurations */
