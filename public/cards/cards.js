@@ -238,6 +238,66 @@ var Utils$1 = function () {
         }));
       }
     }
+  }, {
+    key: 'loadFont',
+    value: function () {
+      var _ref = asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(path) {
+        var components, cache, style, css;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                components = (path || '').match(/(?:^|.*\/)([^\/]+)\.([^\/\.]+)$/);
+
+                if (components) {
+                  _context.next = 3;
+                  break;
+                }
+
+                return _context.abrupt('return');
+
+              case 3:
+                cache = localStorage.getItem(path);
+
+                if (cache) {
+                  _context.next = 11;
+                  break;
+                }
+
+                _context.next = 7;
+                return fetch(path);
+
+              case 7:
+                _context.next = 9;
+                return _context.sent.text();
+
+              case 9:
+                cache = _context.sent;
+
+                localStorage.setItem(path, cache);
+
+              case 11:
+                style = document.createElement('style');
+                css = '\n      @font-face {\n        font-family: \'' + components[1] + '\';\n        src: url(\'' + cache.replace(/\s+$/, '') + '\') format(\'' + components[2] + '\');\n        font-weight: 400;\n        font-style: normal;\n      }';
+
+                style.setAttribute('type', 'text/css');
+                style.appendChild(document.createTextNode(css));
+                document.head.appendChild(style);
+
+              case 16:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function loadFont(_x) {
+        return _ref.apply(this, arguments);
+      }
+
+      return loadFont;
+    }()
   }]);
   return Utils;
 }();
@@ -808,6 +868,7 @@ var App = function (_React$Component) {
   return App;
 }(React.Component);
 
+Utils$1.loadFont('./res/pzh.woff2');
 Utils$1.debug('%cIn DEBUG mode', 'font-weight: bold;');
 ReactDOM.render(React.createElement(App, null), document.getElementById('app'));
 

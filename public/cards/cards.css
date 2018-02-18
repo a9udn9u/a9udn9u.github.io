@@ -43,6 +43,7 @@
 }
 
 .shuang .card-text {
+  font-family: pzh, serif;
   display: flex;
   align-items: center;
   justify-content: center;
