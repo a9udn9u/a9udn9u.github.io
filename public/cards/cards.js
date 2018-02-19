@@ -242,7 +242,8 @@ var Utils$1 = function () {
     key: 'loadFont',
     value: function () {
       var _ref = asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(path) {
-        var components, cache, style, css;
+        var ver = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '1';
+        var components, versionKey, valueKey, version, value, style, css;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -257,34 +258,34 @@ var Utils$1 = function () {
                 return _context.abrupt('return');
 
               case 3:
-                cache = localStorage.getItem(path);
+                versionKey = path + '-version';
+                valueKey = path + '-value';
+                version = localStorage.getItem(versionKey);
+                value = void 0;
 
-                if (cache) {
-                  _context.next = 11;
+                if (!(!version || version !== ver || !(value = localStorage.getItem(valueKey)))) {
+                  _context.next = 13;
                   break;
                 }
 
-                _context.next = 7;
-                return fetch(path);
+                _context.next = 10;
+                return Utils.fetch(path);
 
-              case 7:
-                _context.next = 9;
-                return _context.sent.text();
+              case 10:
+                value = _context.sent;
 
-              case 9:
-                cache = _context.sent;
+                localStorage.setItem(versionKey, ver);
+                localStorage.setItem(valueKey, value);
 
-                localStorage.setItem(path, cache);
-
-              case 11:
+              case 13:
                 style = document.createElement('style');
-                css = '\n      @font-face {\n        font-family: \'' + components[1] + '\';\n        src: url(\'' + cache.replace(/\s+$/, '') + '\') format(\'' + components[2] + '\');\n        font-weight: 400;\n        font-style: normal;\n      }';
+                css = '\n      @font-face {\n        font-family: \'' + components[1] + '\';\n        src: url(\'' + value.trim() + '\') format(\'' + components[2] + '\');\n        font-weight: 400;\n        font-style: normal;\n      }';
 
                 style.setAttribute('type', 'text/css');
                 style.appendChild(document.createTextNode(css));
                 document.head.appendChild(style);
 
-              case 16:
+              case 18:
               case 'end':
                 return _context.stop();
             }
@@ -292,12 +293,107 @@ var Utils$1 = function () {
         }, _callee, this);
       }));
 
-      function loadFont(_x) {
+      function loadFont(_x3) {
         return _ref.apply(this, arguments);
       }
 
       return loadFont;
     }()
+  }, {
+    key: 'fetch',
+    value: function (_fetch) {
+      function fetch(_x) {
+        return _fetch.apply(this, arguments);
+      }
+
+      fetch.toString = function () {
+        return _fetch.toString();
+      };
+
+      return fetch;
+    }(function () {
+      var _ref2 = asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(url) {
+        var retry = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3;
+        var text, status, msg, resp;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                text = void 0, status = void 0, msg = void 0;
+
+              case 1:
+                if (!retry--) {
+                  _context2.next = 18;
+                  break;
+                }
+
+                _context2.next = 4;
+                return fetch('' + url);
+
+              case 4:
+                resp = _context2.sent;
+
+                if (!(resp.status >= 200 && resp.status <= 299)) {
+                  _context2.next = 12;
+                  break;
+                }
+
+                _context2.next = 8;
+                return resp.text();
+
+              case 8:
+                text = _context2.sent;
+                return _context2.abrupt('break', 18);
+
+              case 12:
+                status = resp.status;
+                _context2.next = 15;
+                return resp.text();
+
+              case 15:
+                msg = _context2.sent;
+
+              case 16:
+                _context2.next = 1;
+                break;
+
+              case 18:
+                if (text) {
+                  _context2.next = 20;
+                  break;
+                }
+
+                throw 'Failed fetching ' + url + '. Status: ' + status + ', message: ' + msg;
+
+              case 20:
+                return _context2.abrupt('return', text);
+
+              case 21:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      return function (_x5) {
+        return _ref2.apply(this, arguments);
+      };
+    }())
+  }, {
+    key: 'getDPI',
+    value: function getDPI() {
+      var div = document.createElement('div');
+      div.style.height = '1in';
+      div.style.width = '1in';
+      div.style.top = '-100%';
+      div.style.left = '-100%';
+      div.style.position = 'absolute';
+      document.body.appendChild(div);
+      var result = div.offsetHeight;
+      document.body.removeChild(div);
+      return result;
+    }
   }]);
   return Utils;
 }();
@@ -359,15 +455,13 @@ var ImageSearch = function () {
                   url: encodeURIComponent(url)
                 });
                 proxyUrl = PROXY_URL + '?' + serializeParams(proxyParams);
-                _context.next = 6;
-                return fetch(proxyUrl);
+                _context.t0 = JSON;
+                _context.next = 7;
+                return Utils$1.fetch(proxyUrl);
 
-              case 6:
-                _context.next = 8;
-                return _context.sent.json();
-
-              case 8:
-                resp = _context.sent;
+              case 7:
+                _context.t1 = _context.sent;
+                resp = _context.t0.parse.call(_context.t0, _context.t1);
 
                 if (!resp.error) {
                   _context.next = 13;
@@ -433,7 +527,7 @@ var SearchBar = function (_React$Component) {
                 response = void 0;
                 _context.prev = 6;
                 _context.next = 9;
-                return ImageSearch.search(job.terms + ' 卡通', job.startIndex, SEARCH_PAGE_SIZE);
+                return ImageSearch.search(job.terms, job.startIndex, SEARCH_PAGE_SIZE);
 
               case 9:
                 response = _context.sent;
@@ -740,11 +834,11 @@ var CardList = function (_React$Component) {
     };
 
     _this.state = { cards: [] };
-    _this.cardHolder = new CardHolder();
+    _this.cardHolder = props.cardHolder;
     _this.cardStyle = {};
     _this.rowStyle = {};
     _this.rowHeightFactor = 1;
-    _this.aspectRatio = 8 / 11; // US letter
+    _this.aspectRatio = 8.5 / 11; // US letter
     _this.cardMargin = 8;
     _this.calculateCardStyle();
     EventHub.on(Events.ADD_CARD, _this.addCard);
@@ -763,6 +857,54 @@ var ReviewPage = function (_React$Component) {
 
     var _this = possibleConstructorReturn(this, (ReviewPage.__proto__ || Object.getPrototypeOf(ReviewPage)).call(this, props));
 
+    _this.build = function () {
+      var view = document.querySelector('#print');
+      var fragment = document.createDocumentFragment();
+      var dpi = Utils$1.getDPI();
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = _this.cardHolder.values()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var card = _step.value;
+
+          var pageWidth = Math.floor(dpi * 11),
+              pageHeight = Math.floor((dpi - 1) * 8.5);
+          var textWidth = Math.min(pageWidth * 0.6, pageHeight * 0.8);
+          var fontSize = textWidth / card.text.length;
+          var textEl = document.createElement('div');
+          var imageEl = document.createElement('img');
+          textEl.style.width = imageEl.style.width = pageWidth + 'px';
+          textEl.style.height = imageEl.style.height = pageHeight + 'px';
+          textEl.style.fontSize = fontSize + 'px';
+          textEl.className = 'text';
+          imageEl.className = 'image';
+          textEl.textContent = card.text;
+          imageEl.src = card.image;
+          fragment.appendChild(textEl);
+          fragment.appendChild(imageEl);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      view.innerHTML = '';
+      view.appendChild(fragment);
+      window.print();
+    };
+
     _this.renderToolbar = function () {
       return React.createElement(
         Ons.Toolbar,
@@ -772,7 +914,7 @@ var ReviewPage = function (_React$Component) {
           { className: 'center action-bar' },
           React.createElement(
             Ons.Button,
-            { modifier: 'quiet', onClick: function onClick(e) {} },
+            { modifier: 'quiet', onClick: _this.build },
             '\u521B\u5EFA\u5B57\u5361'
           )
         )
@@ -783,10 +925,11 @@ var ReviewPage = function (_React$Component) {
       return React.createElement(
         Ons.Page,
         { className: 'review-page', renderToolbar: _this.renderToolbar },
-        React.createElement(CardList, null)
+        React.createElement(CardList, { cardHolder: _this.cardHolder })
       );
     };
 
+    _this.cardHolder = new CardHolder();
     return _this;
   }
 

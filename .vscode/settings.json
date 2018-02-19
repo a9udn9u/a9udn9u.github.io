@@ -1,5 +1,11 @@
 {
   "files.exclude": {
     "public": true,
+  },
+  "search.exclude": {
+    "msn": true,
+    "newsmth": true,
+    "cards": true,
+    "public": true
   }
 }
